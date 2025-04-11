@@ -1,0 +1,55 @@
+<html>
+    <head>
+        <title>출퇴근 기록</title>
+    </head>
+    <body>
+        <h1>출퇴근 기록 시스템</h1>
+        <form id="attendance-form">
+            <label>이름: </label>
+            <input type="text" id="name" required />
+            <br />
+            <button type="button" onclick="checkIn()">출근</button>
+            <button type="button" onclick="checkOut()">퇴근</button>
+        </form>
+
+        <script>
+            const sheetUrl = "https://script.google.com/macros/s/AKfycbwUxT87iz7hJJK3gTKnHneWpxNOu75dMRh7AmcRjEZfARkzCtgjh_1ubzzFmHUryh5-/exec"; // 구글 앱 스크립트 웹 앱 URL
+
+            // 출근 버튼 클릭 시
+            function checkIn() {
+                const name = document.getElementById('name').value;
+                const time = new Date().toISOString();
+                sendData("출근", name, time);
+            }
+
+            // 퇴근 버튼 클릭 시
+            function checkOut() {
+                const name = document.getElementById('name').value;
+                const time = new Date().toISOString();
+                sendData("퇴근", name, time);
+            }
+
+            // 데이터 Google Apps Script로 전송
+            function sendData(action, name, time) {
+                const latitude = 35.268738;  // 현재 위치 위도
+                const longitude = 129.232112; // 현재 위치 경도
+
+                // POST 요청을 사용하여 Google Apps Script에 데이터 전송
+                fetch(sheetUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: `name=${name}&action=${action}&latitude=${latitude}&longitude=${longitude}`
+                })
+                .then(response => response.text())
+                .then(data => {
+                    alert(action + " 완료: " + data); // 완료 시 알림
+                })
+                .catch(error => {
+                    console.error('Error:', error); // 에러 발생 시 로그
+                });
+            }
+        </script>
+    </body>
+</html>
