@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>출퇴근 기록</title>
+        <title>출퇴근 관리 시스템</title>
         <style>
             body {
                 font-family: 'Arial', sans-serif;
@@ -27,7 +27,7 @@
             }
 
             h1 {
-                font-size: 24px;
+                font-size: 36px;
                 color: #333;
                 margin-bottom: 20px;
             }
@@ -51,11 +51,6 @@
                 transition: 0.3s;
             }
 
-            select:focus, button:focus {
-                border-color: #5c6bc0;
-                outline: none;
-            }
-
             button {
                 background-color: #5c6bc0;
                 color: white;
@@ -70,26 +65,17 @@
                 background-color: #3a4581;
             }
 
-            .message {
-                font-size: 14px;
-                color: #888;
-                margin-top: 15px;
-            }
-
             .error-message {
                 color: red;
                 font-size: 16px;
                 margin-top: 20px;
             }
 
-            .error-message span {
-                font-size: 20px;
-            }
         </style>
     </head>
     <body>
         <div class="container">
-            <h1>출퇴근 기록 시스템..</h1>
+            <h1>출퇴근 관리 시스템</h1>
             <form id="attendance-form">
                 <label for="name">이름 선택</label>
                 <select id="name" required>
@@ -105,12 +91,11 @@
                 <button type="button" onclick="checkIn()">출근</button>
                 <button type="button" onclick="checkOut()">퇴근</button>
             </form>
-            <div class="message">출근/퇴근 버튼을 눌러 기록을 남기세요.</div>
             <div class="error-message" id="error-message"></div>
         </div>
 
         <script>
-            const sheetUrl = "https://script.google.com/macros/s/AKfycbwUoDAnx8RYiRX8AaQFoULvs4yzGAbRSwEsLLowGBvodPspMzq6HOejM5ZPhPaZvbfF/exec"; // 구글 앱 스크립트 웹 앱 URL
+            const sheetUrl = "https://script.google.com/macros/s/AKfycby3PRWA0dTUz6g8oJVbfcfqBNhpRa9Ac20oSCXWbj1WKvQXSrMbRj8KX6bVL3vZZzc7/exec"; // 구글 앱 스크립트 웹 앱 URL
 
             // 출근 버튼 클릭 시
             function checkIn() {
