@@ -81,11 +81,20 @@
                 margin-top: 15px;
             }
 
+            .error-message {
+                color: red;
+                font-size: 16px;
+                margin-top: 20px;
+            }
+
+            .error-message span {
+                font-size: 20px;
+            }
         </style>
     </head>
     <body>
         <div class="container">
-            <h1>출퇴근 기록 시스템</h1>
+            <h1>던킨 부산종합운동장역점 출퇴근 기록 시스템</h1>
             <form id="attendance-form">
                 <label for="name">이름 선택</label>
                 <select id="name" required>
@@ -102,6 +111,7 @@
                 <button type="button" onclick="checkOut()">퇴근</button>
             </form>
             <div class="message">출근/퇴근 버튼을 눌러 기록을 남기세요.</div>
+            <div class="error-message" id="error-message"></div>
         </div>
 
         <script>
@@ -128,6 +138,9 @@
 
             // 위치를 확인하고, 140m 이내일 경우에만 출퇴근 기록을 등록
             function checkLocation(name, time, action) {
+                const errorMessageElement = document.getElementById("error-message");
+                errorMessageElement.innerHTML = ""; // 초기화
+
                 if (navigator.geolocation) {
                     navigator.geolocation.getCurrentPosition(function(position) {
                         const userLatitude = position.coords.latitude;
@@ -139,13 +152,13 @@
                         if (distance <= maxDistance) {
                             sendData(action, name, time);
                         } else {
-                            alert("매장 반경 140m 내에서만 출퇴근을 기록할 수 있습니다.");
+                            showError("매장과 거리가 너무 멉니다. 🏃‍♂️🚶‍♀️", "red");
                         }
                     }, function(error) {
-                        alert("위치 정보를 가져오는 데 실패했습니다.");
+                        showError("위치 정보가 실패했습니다. 위치 서비스를 활성화하세요! 📍", "orange");
                     });
                 } else {
-                    alert("이 브라우저는 위치 서비스를 지원하지 않습니다.");
+                    showError("이 브라우저는 위치 서비스를 지원하지 않습니다. 🌐", "blue");
                 }
             }
 
@@ -184,7 +197,14 @@
                 })
                 .catch(error => {
                     console.error('Error:', error); // 에러 발생 시 로그
+                    showError("알 수 없는 오류가 발생했습니다. 잠시 후 다시 시도해 주세요. ⚠️", "red");
                 });
+            }
+
+            // 오류 메시지를 화면에 출력하는 함수
+            function showError(message, color) {
+                const errorMessageElement = document.getElementById("error-message");
+                errorMessageElement.innerHTML = `<span style="color:${color};">${message}</span>`;
             }
         </script>
     </body>
