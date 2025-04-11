@@ -94,7 +94,7 @@
     </head>
     <body>
         <div class="container">
-            <h1>던킨 부산종합운동장역점 출퇴근 기록 시스템.</h1>
+            <h1>출퇴근 기록 시스템</h1>
             <form id="attendance-form">
                 <label for="name">이름 선택</label>
                 <select id="name" required>
@@ -115,12 +115,7 @@
         </div>
 
         <script>
-            const sheetUrl = "https://script.google.com/macros/s/AKfycbzdjoRgFKnNno4jOmHyA0NZGHurSre0-bjsb45ei9Kh3ssJPWW3vcNpkZlw-VC-MHwy/exec"; // 구글 앱 스크립트 웹 앱 URL
-
-            // 매장 위치 (위도, 경도)
-            const storeLatitude = 35.268738;
-            const storeLongitude = 129.232112;
-            const maxDistance = 140; // 140m
+            const sheetUrl = "https://script.google.com/macros/s/AKfycbzL1bhYf3O2J-kTbXL3ZF65R7PO0Et9TaoXd1I0weB3OBLkswofAU65lhwi4EHFth-E/exec"; // 구글 앱 스크립트 웹 앱 URL
 
             // 출근 버튼 클릭 시
             function checkIn() {
@@ -147,9 +142,9 @@
                         const userLongitude = position.coords.longitude;
                         
                         // 두 지점 사이의 거리를 계산 (단위: 미터)
-                        const distance = getDistance(storeLatitude, storeLongitude, userLatitude, userLongitude);
+                        const distance = getDistance(35.268738, 129.232112, userLatitude, userLongitude); // 매장 위도/경도
                         
-                        if (distance <= maxDistance) {
+                        if (distance <= 140) {
                             sendData(action, name, time);
                         } else {
                             showError("매장과 거리가 너무 멉니다. 🏃‍♂️🚶‍♀️", "red");
@@ -197,7 +192,7 @@
                 })
                 .catch(error => {
                     console.error('Error:', error); // 에러 발생 시 로그
-                    showError("알 수 없는 오류가 발생했습니다. 잠시 후 다시 시도해 주세요. ⚠️", "red");
+                    showError("알 수 없는 오류가 발생했습니다. ⚠️", "red");
                 });
             }
 
