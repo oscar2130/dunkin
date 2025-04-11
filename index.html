@@ -1,35 +1,171 @@
-<html>
+<!DOCTYPE html>
+<html lang="ko">
     <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>출퇴근 기록</title>
+        <style>
+            body {
+                font-family: 'Arial', sans-serif;
+                background-color: #f4f7fc;
+                color: #333;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                margin: 0;
+            }
+
+            .container {
+                background-color: #fff;
+                border-radius: 8px;
+                padding: 30px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                width: 100%;
+                max-width: 400px;
+                text-align: center;
+            }
+
+            h1 {
+                font-size: 24px;
+                color: #333;
+                margin-bottom: 20px;
+            }
+
+            label {
+                font-size: 16px;
+                margin-bottom: 10px;
+                display: block;
+                color: #555;
+            }
+
+            select, button {
+                width: 100%;
+                padding: 12px;
+                margin: 8px 0;
+                border: 2px solid #ccc;
+                border-radius: 5px;
+                font-size: 16px;
+                background-color: #f9f9f9;
+                cursor: pointer;
+                transition: 0.3s;
+            }
+
+            select:focus, button:focus {
+                border-color: #5c6bc0;
+                outline: none;
+            }
+
+            button {
+                background-color: #5c6bc0;
+                color: white;
+                font-weight: bold;
+            }
+
+            button:hover {
+                background-color: #3f4b8f;
+            }
+
+            button:active {
+                background-color: #3a4581;
+            }
+
+            button:disabled {
+                background-color: #d3d3d3;
+                cursor: not-allowed;
+            }
+
+            .message {
+                font-size: 14px;
+                color: #888;
+                margin-top: 15px;
+            }
+
+        </style>
     </head>
     <body>
-        <h1>출퇴근 기록 시스템</h1>
-        <form id="attendance-form">
-            <label>이름: </label>
-            <input type="text" id="name" required />
-            <br />
-            <button type="button" onclick="checkIn()">출근</button>
-            <button type="button" onclick="checkOut()">퇴근</button>
-        </form>
+        <div class="container">
+            <h1>출퇴근 기록 시스템</h1>
+            <form id="attendance-form">
+                <label for="name">이름 선택</label>
+                <select id="name" required>
+                    <option value="권혜경">권혜경</option>
+                    <option value="김예원">김예원</option>
+                    <option value="권혜은">권혜은</option>
+                    <option value="홍다빈">홍다빈</option>
+                    <option value="김도영">김도영</option>
+                    <option value="석정미">석정미</option>
+                    <option value="김지명">김지명</option>
+                </select>
+
+                <button type="button" onclick="checkIn()">출근</button>
+                <button type="button" onclick="checkOut()">퇴근</button>
+            </form>
+            <div class="message">출근/퇴근 버튼을 눌러 기록을 남기세요.</div>
+        </div>
 
         <script>
             const sheetUrl = "https://script.google.com/macros/s/AKfycbwUxT87iz7hJJK3gTKnHneWpxNOu75dMRh7AmcRjEZfARkzCtgjh_1ubzzFmHUryh5-/exec"; // 구글 앱 스크립트 웹 앱 URL
+
+            // 매장 위치 (위도, 경도)
+            const storeLatitude = 35.268738;
+            const storeLongitude = 129.232112;
+            const maxDistance = 140; // 140m
 
             // 출근 버튼 클릭 시
             function checkIn() {
                 const name = document.getElementById('name').value;
                 const time = new Date().toISOString();
-                sendData("출근", name, time);
+                checkLocation(name, time, "출근");
             }
 
             // 퇴근 버튼 클릭 시
             function checkOut() {
                 const name = document.getElementById('name').value;
                 const time = new Date().toISOString();
-                sendData("퇴근", name, time);
+                checkLocation(name, time, "퇴근");
             }
 
-            // 데이터 Google Apps Script로 전송
+            // 위치를 확인하고, 140m 이내일 경우에만 출퇴근 기록을 등록
+            function checkLocation(name, time, action) {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(function(position) {
+                        const userLatitude = position.coords.latitude;
+                        const userLongitude = position.coords.longitude;
+                        
+                        // 두 지점 사이의 거리를 계산 (단위: 미터)
+                        const distance = getDistance(storeLatitude, storeLongitude, userLatitude, userLongitude);
+                        
+                        if (distance <= maxDistance) {
+                            sendData(action, name, time);
+                        } else {
+                            alert("매장 반경 140m 내에서만 출퇴근을 기록할 수 있습니다.");
+                        }
+                    }, function(error) {
+                        alert("위치 정보를 가져오는 데 실패했습니다.");
+                    });
+                } else {
+                    alert("이 브라우저는 위치 서비스를 지원하지 않습니다.");
+                }
+            }
+
+            // 두 지점 사이의 거리를 계산하는 함수 (단위: 미터)
+            function getDistance(lat1, lon1, lat2, lon2) {
+                const R = 6371e3; // 지구 반지름 (미터 단위)
+                const φ1 = lat1 * Math.PI / 180;
+                const φ2 = lat2 * Math.PI / 180;
+                const Δφ = (lat2 - lat1) * Math.PI / 180;
+                const Δλ = (lon2 - lon1) * Math.PI / 180;
+
+                const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+                          Math.cos(φ1) * Math.cos(φ2) *
+                          Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+                const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+                return R * c; // 미터 단위로 반환
+            }
+
+            // Google Apps Script로 데이터 전송
             function sendData(action, name, time) {
                 const latitude = 35.268738;  // 현재 위치 위도
                 const longitude = 129.232112; // 현재 위치 경도
